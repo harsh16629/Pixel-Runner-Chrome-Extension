@@ -1,19 +1,26 @@
 # Pixel Runner Chrome Extension
+A fun little Chrome extension that adds a little pixelated character who runs across the top of your browser window.
 
-
+### Meet Devina!
 <img src="chibi-pixel.png" alt="Pixel art character" width="250">
 
-A fun, simple Chrome extension that adds a little pixelated character who runs across the top of your browser window.
+The whimsical girl who runs across your browser. What is she trying to do? Maybe she finds what you're reading interesting? Hard to tell, she's a curious little hobbit after all.
 
-## Features
+
+## 📦Current Features
 
 - **Animated Character**: A pixelated character runs back and forth at the top of your screen.
-- **Page Title Interaction**: When the character reaches the right side of the screen, it "reads" the current page's title and displays it in a speech bubble.
+- **Page Interaction**: When the character reaches the right side of the screen, it "reads" the current page's title and displays it in a speech bubble.
 - **Toggle On/Off**: Easily enable or disable the character using the extension's popup icon.
 - **Persistent State**: Your on/off preference is saved and remembered across browser sessions.
 - **Crisp Pixel Art**: Uses `image-rendering: pixelated` to ensure the GIF looks sharp and not blurry.
 
-## How It Works
+## 🛠️Planned Features
+
+- **Animated Character**: More movements for the character, more area to be covered in the upcomming releases.
+- **Page Interaction**: Character will be equiped with a ladder and a hook to traverse the webpage.
+- **Extension**: Future updated will add more color and life to the otherwise bland extension.
+## 🔆How It Works
 
 This extension is built with standard web technologies and Chrome Extension APIs.
 
@@ -26,7 +33,7 @@ This extension is built with standard web technologies and Chrome Extension APIs
 -   **`styles.css`**: This file contains the styling for the character's container, the GIF itself, and the speech bubble. It uses a high `z-index` to ensure the character appears on top of most page content and `pointer-events: none` so the character doesn't interfere with clicking on the page.
 -   **`chrome.storage.onChanged`**: A listener in `content.js` watches for changes in the on/off state and will either create (`init()`) or remove (`remove()`) the character from the page accordingly.
 
-## Project Files
+## 📂Core Project Files
 
 -   `manifest.json`: The extension's manifest file, defining permissions, scripts, and the popup.
 -   `content.js`: The main content script for animating the character.
@@ -36,7 +43,7 @@ This extension is built with standard web technologies and Chrome Extension APIs
 -   `runGIF-trans.gif`: The animated GIF of the running character.
 -   `icon.png` (or similar): The icon for the extension in the browser toolbar.
 
-## How to Install (for Development)
+## 📩How to Install
 
 1.  Download or clone this repository to your local machine.
 2.  Open Google Chrome and navigate to `chrome://extensions`.
