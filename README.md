@@ -1,7 +1,7 @@
 # Pixel Runner Chrome Extension
 
 
-<img src="chibi-pixel.png" alt="Pixel art character" width="500">
+<img src="chibi-pixel.png" alt="Pixel art character" width="250">
 
 A fun, simple Chrome extension that adds a little pixelated character who runs across the top of your browser window.
 
