@@ -1,5 +1,8 @@
 # Pixel Runner Chrome Extension
 
+
+![alt text](image.png)
+
 A fun, simple Chrome extension that adds a little pixelated character who runs across the top of your browser window.
 
 ## Features
