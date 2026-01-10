@@ -1,0 +1,37 @@
+/* 1. The Container: Moves Left <-> Right */
+#pixel-runner-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 64px;       /* Adjust this to match your GIF width */
+    height: 64px;      /* Adjust this to match your GIF height */
+    z-index: 2147483647; /* Max Z-Index */
+    pointer-events: none; /* Let clicks pass through */
+    transition: transform 0.2s; /* Smooth flipping when turning */
+}
+
+/* 2. The GIF Image */
+.runner-gif {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensures the GIF doesn't get stretched */
+    image-rendering: pixelated; /* Keeps pixel art crisp */
+}
+
+/* 3. The Speech Bubble (Unchanged) */
+.runner-speech-bubble {
+    position: absolute;
+    top: 70px; 
+    left: 0;
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px;
+    font-size: 10px;
+    font-family: monospace;
+    display: none;
+    white-space: nowrap;
+    border-radius: 4px;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+}
+.runner-speech-bubble.visible { display: block; }
