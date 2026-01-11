@@ -1,10 +1,10 @@
 // --- CONFIGURATION ---
 const ASSETS = {
-    run: chrome.runtime.getURL('running.gif'),
-    stand: chrome.runtime.getURL('standing.png'),
-    jump: chrome.runtime.getURL('jump.gif'),
-    midair: chrome.runtime.getURL('midair.png'),
-    land: chrome.runtime.getURL('land.png') // New Asset
+    run: chrome.runtime.getURL('running-standard.gif'),
+    stand: chrome.runtime.getURL('standing-old.png'),
+    jump: chrome.runtime.getURL('jumping-old.gif'),
+    midair: chrome.runtime.getURL('midair-old.png'),
+    land: chrome.runtime.getURL('land-old.png') // New Asset
 };
 
 // --- STATE VARIABLES ---
@@ -143,7 +143,7 @@ function startJumpSequence() {
 
             }, 2500); // Fall duration (Must match CSS .falling transition)
 
-        }, 500); // Jump GIF duration
+        }, 750); // Jump GIF duration
 
     }, 1000); // Initial Stand duration
 }
