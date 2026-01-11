@@ -43,7 +43,7 @@ This extension is built with standard web technologies and Chrome Extension APIs
 -   `runGIF-trans.gif`: The animated GIF of the running character.
 -   `icon.png` (or similar): The icon for the extension in the browser toolbar.
 
-## 📩How to Install
+## 📩How to Install (for development)
 
 1.  Download or clone this repository to your local machine.
 2.  Open Google Chrome and navigate to `chrome://extensions`.
@@ -51,3 +51,5 @@ This extension is built with standard web technologies and Chrome Extension APIs
 4.  Click the **"Load unpacked"** button.
 5.  Select the directory where you saved the project files.
 6.  The Pixel Runner extension should now appear in your extensions list and in your browser toolbar!
+
+### ⏳ Since this project is still in early development, an official Google Webstore release is pending. I plan to release this before 12th March 2026.  
