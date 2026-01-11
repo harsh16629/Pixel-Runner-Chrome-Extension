@@ -15,7 +15,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["runGIF-trans.gif"],
+      "resources": ["running.gif", "standing.png", "jump.gif", "midair.png", "land.png"],
       "matches": ["<all_urls>"]
     }
   ]

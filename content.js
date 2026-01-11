@@ -1,101 +1,157 @@
-// State Variables
-let animationId = null;
-let container = null;
-let positionX = 0;
-let direction = 1; // 1 = right, -1 = left
+// --- CONFIGURATION ---
+const ASSETS = {
+    run: chrome.runtime.getURL('running.gif'),
+    stand: chrome.runtime.getURL('standing.png'),
+    jump: chrome.runtime.getURL('jump.gif'),
+    midair: chrome.runtime.getURL('midair.png'),
+    land: chrome.runtime.getURL('land.png') // New Asset
+};
 
+// --- STATE VARIABLES ---
+let container = null;
+let imgElement = null;
+let animationId = null;
+
+let positionX = 0;
+let direction = 1; 
+let isRunning = false;
+let wallHits = 0;
+let onBottom = false;
+
+// --- INIT ---
 function init() {
     if (document.getElementById('pixel-runner-container')) return;
 
-    // 1. Create Container
     container = document.createElement('div');
     container.id = 'pixel-runner-container';
 
-    // 2. Create the GIF Image
-    const gifImage = document.createElement('img');
-    gifImage.classList.add('runGIF-trans');
-    // Set size to 64x64 px
-    gifImage.style.width = '64px';
-    gifImage.style.height = '64px';
-    // Inject the GIF URL
-    const gifUrl = chrome.runtime.getURL('runGIF-trans.gif');
-    gifImage.src = gifUrl;
+    imgElement = document.createElement('img');
+    imgElement.classList.add('runner-gif');
+    imgElement.src = ASSETS.run;
 
-    // 3. Create Bubble
     const bubble = document.createElement('div');
     bubble.classList.add('runner-speech-bubble');
     bubble.id = 'pixel-runner-bubble';
     bubble.innerText = "Hmm...";
 
-    // 4. Assemble
-    container.appendChild(gifImage);
+    container.appendChild(imgElement);
     container.appendChild(bubble);
     document.body.appendChild(container);
 
-    // Reset
     positionX = 0;
+    wallHits = 0;
+    onBottom = false;
+    isRunning = true;
     animate();
 }
 
 function remove() {
+    isRunning = false;
     if (animationId) cancelAnimationFrame(animationId);
-    const existingContainer = document.getElementById('pixel-runner-container');
-    if (existingContainer) existingContainer.remove();
+    if (container) container.remove();
     container = null;
 }
 
+// --- MAIN LOOP ---
 function animate() {
-    if (!container) return;
+    if (!isRunning || !container) return;
 
     const screenWidth = window.innerWidth;
-    const charWidth = 64; // Match your GIF width
-    const speed = 2;
+    const charWidth = 64;
+    const speed = 3;
 
     positionX += speed * direction;
 
-    // Boundaries Check
     if (positionX >= (screenWidth - charWidth)) {
         direction = -1;
-        // Flip the CONTAINER to face Left
         container.style.transform = "scaleX(-1)";
-        readPageTitle();
+        handleWallHit();
     } else if (positionX <= 0) {
         direction = 1;
-        // Flip the CONTAINER to face Right
         container.style.transform = "scaleX(1)";
+        handleWallHit();
     }
 
     container.style.left = positionX + 'px';
-    animationId = requestAnimationFrame(animate);
+    
+    if (isRunning) {
+        animationId = requestAnimationFrame(animate);
+    }
 }
 
-function readPageTitle() {
-    const bubble = document.getElementById('pixel-runner-bubble');
-    if (!bubble) return;
-
-    // Correct the text direction so it's not backwards when character is flipped
-    // We apply a counter-flip to the bubble
-    bubble.style.transform = "scaleX(-1)"; 
-
-    const currentTitle = document.title.length > 20 
-        ? document.title.substring(0, 20) + "..." 
-        : document.title;
+function handleWallHit() {
+    if (onBottom) return; 
+    wallHits++;
     
-    bubble.innerText = `Reading: "${currentTitle}"`;
-    bubble.classList.add('visible');
+    // Stop after 2 wall hits (approx 1 full lap)
+    if (wallHits >= 2) {
+        isRunning = false; 
+        startJumpSequence();
+    }
+}
+
+// --- THE ROBUST JUMP SEQUENCE ---
+function startJumpSequence() {
+    
+    // 1. STAND
+    imgElement.src = ASSETS.stand;
+    
+    // Ensure we are strictly at the top 0px before starting
+    container.style.top = '0px'; 
+    container.classList.remove('falling'); // Ensure gravity is OFF
 
     setTimeout(() => {
-        if(bubble) bubble.classList.remove('visible');
-    }, 2000);
+        
+        // 2. JUMP ANIMATION
+        imgElement.src = ASSETS.jump;
+
+        setTimeout(() => {
+            
+            // 3. MIDAIR IMAGE & ACTIVATE GRAVITY
+            imgElement.src = ASSETS.midair;
+            
+            // A. Turn on the CSS Transition
+            container.classList.add('falling');
+
+            // B. Force the browser to realize the class changed (Reflow)
+            void container.offsetHeight; 
+
+            // C. Move to Bottom (The transition will now catch this!)
+            const floorPosition = window.innerHeight - 64;
+            container.style.top = floorPosition + "px";
+
+            // Wait for Fall (2.5s matches CSS)
+            setTimeout(() => {
+                
+                // 4. LAND
+                imgElement.src = ASSETS.land;
+                onBottom = true;
+                
+                // Turn off gravity (so she doesn't float if we move her later)
+                container.classList.remove('falling');
+
+                // Wait for Landing Pose
+                setTimeout(() => {
+                    
+                    // 5. RESUME RUNNING
+                    imgElement.src = ASSETS.run;
+                    isRunning = true;
+                    wallHits = 0; 
+                    animate();
+
+                }, 250); // Land pose duration
+
+            }, 2500); // Fall duration (Must match CSS .falling transition)
+
+        }, 500); // Jump GIF duration
+
+    }, 1000); // Initial Stand duration
 }
 
-// Storage Listeners
+// --- LISTENERS ---
 chrome.storage.onChanged.addListener((changes) => {
-    if (changes.enabled) {
-        changes.enabled.newValue ? init() : remove();
-    }
+    if (changes.enabled) changes.enabled.newValue ? init() : remove();
 });
-
 chrome.storage.sync.get(['enabled'], (result) => {
     if (result.enabled !== false) init();
 });
