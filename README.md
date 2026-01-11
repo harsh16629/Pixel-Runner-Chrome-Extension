@@ -52,4 +52,5 @@ This extension is built with standard web technologies and Chrome Extension APIs
 5.  Select the directory where you saved the project files.
 6.  The Pixel Runner extension should now appear in your extensions list and in your browser toolbar!
 
-### ⏳ Since this project is still in early development, an official Google Webstore release is pending. I plan to release this before 12th March 2026.  
+## ⏳ Official Google Webstore Release
+- Since this project is still in early development, an official Google Webstore release is pending. I plan to release this before 12th March 2026.  
