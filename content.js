@@ -20,6 +20,18 @@ const BUBBLE_LINES = [
     "You're on ${document.title}, fascinating!",
     "${document.title} caught your attention, huh?"
 ];
+const MID_BUBBLE_LINES = [
+    "Hmmmm, reading ${document.title}, I see!",
+    "Looks like you're exploring ${document.title}.",
+    "Oh, ${document.title}? That's interesting!",
+    "I see you're diving into ${document.title}.",
+    "Hmm, ${document.title} seems fun!",
+    "Enjoying ${document.title}, are we?",
+    "Ah, ${document.title}, a fine choice!",
+    "${document.title}? A curious pick!",
+    "You're on ${document.title}, fascinating!",
+    "${document.title} caught your attention, huh?"
+];
 
 // --- STATE VARIABLES ---
 let container = null;
@@ -30,6 +42,7 @@ let positionX = 0;
 let direction = 1; 
 let isRunning = false;
 let onBottom = false;
+let bottomPasses = 0;
 
 // --- INIT ---
 function init() {
@@ -53,6 +66,7 @@ function init() {
 
     positionX = 0;
     onBottom = false;
+    bottomPasses = 0;
     isRunning = true;
     animate();
 }
@@ -99,9 +113,16 @@ function animate() {
             }, 5000); // 5 seconds think time
             return; 
         } else {
-            // Bottom Right -> Just turn around
-            direction = -1;
-            container.style.transform = "scaleX(-1)";
+            // Bottom Right
+            if (bottomPasses === 0) {
+                // 1st time reaching right: Turn around (Run R -> L)
+                bottomPasses++;
+                direction = -1;
+                container.style.transform = "scaleX(-1)";
+            } else {
+                // 2nd time reaching right: Fly Up!
+                startFlyUpSequence();
+            }
         }
 
     } else if (positionX <= 0) {
@@ -163,6 +184,7 @@ function startJumpSequence() {
                 // 4. LAND
                 imgElement.src = ASSETS.land;
                 onBottom = true;
+                bottomPasses = 0; // Reset passes for the new bottom cycle
                 
                 // Turn off gravity (so she doesn't float if we move her later)
                 container.classList.remove('falling');
@@ -182,6 +204,30 @@ function startJumpSequence() {
         }, 750); // Jump GIF duration
 
     }, 1000); // Initial Stand duration
+}
+
+function startFlyUpSequence() {
+    isRunning = false;
+    
+    // 1. Prepare to Fly
+    imgElement.src = ASSETS.midair;
+    container.classList.add('climbing');
+    
+    // 2. Fly Up (Animation handled by CSS)
+    container.style.top = '0px';
+
+    setTimeout(() => {
+        // 3. Arrive at Top
+        onBottom = false;
+        container.classList.remove('climbing');
+        
+        // 4. Resume Running Left
+        imgElement.src = ASSETS.run;
+        direction = -1;
+        container.style.transform = "scaleX(-1)";
+        isRunning = true;
+        animate();
+    }, 2500); // Match CSS transition duration
 }
 
 // --- LISTENERS ---
