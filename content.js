@@ -4,8 +4,22 @@ const ASSETS = {
     stand: chrome.runtime.getURL('standing-old.png'),
     jump: chrome.runtime.getURL('jumping-old.gif'),
     midair: chrome.runtime.getURL('midair-old.png'),
-    land: chrome.runtime.getURL('land-old.png') // New Asset
+    land: chrome.runtime.getURL('land-old.png'), // New Asset
+    thinking: chrome.runtime.getURL('thinking.png')
 };
+
+const BUBBLE_LINES = [
+    "Hmmmm, reading ${document.title}, I see!",
+    "Looks like you're exploring ${document.title}.",
+    "Oh, ${document.title}? That's interesting!",
+    "I see you're diving into ${document.title}.",
+    "Hmm, ${document.title} seems fun!",
+    "Enjoying ${document.title}, are we?",
+    "Ah, ${document.title}, a fine choice!",
+    "${document.title}? A curious pick!",
+    "You're on ${document.title}, fascinating!",
+    "${document.title} caught your attention, huh?"
+];
 
 // --- STATE VARIABLES ---
 let container = null;
@@ -15,7 +29,6 @@ let animationId = null;
 let positionX = 0;
 let direction = 1; 
 let isRunning = false;
-let wallHits = 0;
 let onBottom = false;
 
 // --- INIT ---
@@ -39,7 +52,6 @@ function init() {
     document.body.appendChild(container);
 
     positionX = 0;
-    wallHits = 0;
     onBottom = false;
     isRunning = true;
     animate();
@@ -63,30 +75,55 @@ function animate() {
     positionX += speed * direction;
 
     if (positionX >= (screenWidth - charWidth)) {
-        direction = -1;
-        container.style.transform = "scaleX(-1)";
-        handleWallHit();
+        // RIGHT WALL
+        if (!onBottom) {
+            // CASE A & B: Top Right -> Stop, Think, then Return.
+            positionX = screenWidth - charWidth; 
+            container.style.left = positionX + 'px';
+            isRunning = false; 
+
+            imgElement.src = ASSETS.thinking;
+            const bubble = document.getElementById('pixel-runner-bubble');
+            bubble.innerText = getRandomBubbleLine();
+            
+            // Add 'below' class so it appears on screen (since we are at top)
+            bubble.classList.add('visible', 'below');
+
+            setTimeout(() => {
+                bubble.classList.remove('visible', 'below');
+                imgElement.src = ASSETS.run;
+                direction = -1; // Run Left
+                container.style.transform = "scaleX(-1)";
+                isRunning = true;
+                animate(); 
+            }, 5000); // 5 seconds think time
+            return; 
+        } else {
+            // Bottom Right -> Just turn around
+            direction = -1;
+            container.style.transform = "scaleX(-1)";
+        }
+
     } else if (positionX <= 0) {
-        direction = 1;
-        container.style.transform = "scaleX(1)";
-        handleWallHit();
+        // LEFT WALL
+        if (!onBottom) {
+            // CASE C & D: Top Left -> Jump Down immediately
+            isRunning = false;
+            // Fix: Face right (away from wall) before jumping
+            direction = 1;
+            container.style.transform = "scaleX(1)";
+            startJumpSequence();
+        } else {
+            // Bottom Left -> Turn around
+            direction = 1;
+            container.style.transform = "scaleX(1)";
+        }
     }
 
     container.style.left = positionX + 'px';
     
     if (isRunning) {
         animationId = requestAnimationFrame(animate);
-    }
-}
-
-function handleWallHit() {
-    if (onBottom) return; 
-    wallHits++;
-    
-    // Stop after 2 wall hits (approx 1 full lap)
-    if (wallHits >= 2) {
-        isRunning = false; 
-        startJumpSequence();
     }
 }
 
@@ -136,7 +173,6 @@ function startJumpSequence() {
                     // 5. RESUME RUNNING
                     imgElement.src = ASSETS.run;
                     isRunning = true;
-                    wallHits = 0; 
                     animate();
 
                 }, 250); // Land pose duration
@@ -155,3 +191,8 @@ chrome.storage.onChanged.addListener((changes) => {
 chrome.storage.sync.get(['enabled'], (result) => {
     if (result.enabled !== false) init();
 });
+
+function getRandomBubbleLine() {
+    const randomIndex = Math.floor(Math.random() * BUBBLE_LINES.length);
+    return BUBBLE_LINES[randomIndex].replace('${document.title}', document.title);
+}

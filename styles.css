@@ -30,10 +30,25 @@
 /* 4. Speech Bubble */
 .runner-speech-bubble {
     position: absolute;
-    top: 70px; left: 0;
-    background: white; color: black;
-    border: 1px solid black; padding: 5px;
-    font-size: 10px; font-family: monospace;
-    display: none; white-space: nowrap; border-radius: 4px;
+    bottom: 70px; /* Position above the 64px character */
+    right: 0;     /* Align to right edge so it grows leftwards into screen */
+    left: auto;
+    width: max-content; /* Fit the content */
+    max-width: 300px;   /* But not too wide */
+    background: white; 
+    color: black;
+    border: 2px solid black; 
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px; 
+    font-family: monospace;
+    display: none;
+    z-index: 2147483648; /* Ensure it sits on top */
 }
 .runner-speech-bubble.visible { display: block; }
+
+/* Modifier for when character is at the top (Flip to bottom) */
+.runner-speech-bubble.below {
+    bottom: auto;
+    top: 70px; /* Position below the 64px character */
+}

@@ -15,7 +15,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["running-standard.gif", "standing-old.png", "jumping-old.gif", "midair-old.png", "land-old.png"],
+      "resources": ["running-standard.gif", "standing-old.png", "jumping-old.gif", "midair-old.png", "land-old.png", "thinking.png"],
       "matches": ["<all_urls>"]
     }
   ]
