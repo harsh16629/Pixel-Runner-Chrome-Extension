@@ -36,6 +36,8 @@ let onBottom = false;
 let bottomPasses = 0;
 let hasStoppedTop = false;
 let hasStoppedBottom = false;
+let sessionPixels = 0;
+let saveInterval = null;
 
 // --- INIT ---
 function init() {
@@ -63,11 +65,24 @@ function init() {
     hasStoppedTop = false;
     hasStoppedBottom = false;
     isRunning = true;
+    
+    // Start tracking distance saving (every 5 seconds)
+    saveInterval = setInterval(() => {
+        if (sessionPixels > 0) {
+            chrome.storage.local.get(['pixelRunnerDistance'], (result) => {
+                const currentTotal = result.pixelRunnerDistance || 0;
+                chrome.storage.local.set({ pixelRunnerDistance: currentTotal + sessionPixels });
+                sessionPixels = 0; // Reset session buffer
+            });
+        }
+    }, 5000);
+
     animate();
 }
 
 function remove() {
     isRunning = false;
+    if (saveInterval) clearInterval(saveInterval);
     if (animationId) cancelAnimationFrame(animationId);
     if (container) container.remove();
     container = null;
@@ -82,6 +97,9 @@ function animate() {
     const speed = 3;
 
     positionX += speed * direction;
+    
+    // Track distance
+    if (isRunning) sessionPixels += speed;
 
     // --- RANDOM STOP LOGIC ---
     // Check if we are in the middle 60% of the screen AND running Left-to-Right

@@ -1,18 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body { width: 200px; padding: 10px; font-family: sans-serif; text-align: center; }
-    .switch-container { display: flex; align-items: center; justify-content: center; margin-top: 10px; }
-    button { padding: 8px 16px; cursor: pointer; background: #eee; border: 1px solid #ccc; border-radius: 4px; }
-    button.active { background: #4caf50; color: white; border-color: #4caf50; }
-  </style>
+    <style>
+        body {
+            width: 280px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            text-align: center;
+            user-select: none;
+        }
+        h1 { 
+            font-size: 16px; 
+            margin: 0 0 10px 0; 
+            color: #ff6b6b; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+        }
+        .divider { height: 2px; background: #333; margin: 15px 0; border-radius: 2px; }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: #2d2d2d;
+            padding: 10px;
+            border-radius: 6px;
+            border: 2px solid #444;
+            transition: transform 0.1s;
+        }
+        .stat-box:hover { transform: translateY(-2px); border-color: #666; }
+        .stat-label { font-size: 10px; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-value { font-size: 14px; font-weight: bold; color: #4ecdc4; }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        button:hover { opacity: 0.9; transform: scale(1.02); }
+        button.active { background: #4ecdc4; color: #1a1a1a; }
+        
+        .footer { font-size: 10px; color: #555; margin-top: 15px; font-style: italic; }
+    </style>
 </head>
 <body>
-  <h3>Ceiling Walker</h3>
-  <div class="switch-container">
+    <h1>Chibi Devina Runner</h1>
+    <div class="divider"></div>
+    
+    <div class="stats-container">
+        <div class="stat-box">
+            <div class="stat-label">Distance Ran</div>
+            <div class="stat-value" id="distanceVal">...</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Current Mood</div>
+            <div class="stat-value" id="moodVal">...</div>
+        </div>
+    </div>
+
     <button id="toggleBtn">Turn On</button>
-  </div>
-  <script src="popup.js"></script>
+    
+    <div class="footer">She's probably judging your tabs.</div>
+    <script src="popup.js"></script>
 </body>
 </html>
