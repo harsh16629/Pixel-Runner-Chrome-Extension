@@ -5,32 +5,23 @@ const ASSETS = {
     jump: chrome.runtime.getURL('jumping-old.gif'),
     midair: chrome.runtime.getURL('midair-old.png'),
     land: chrome.runtime.getURL('land-old.png'), // New Asset
-    thinking: chrome.runtime.getURL('thinking.png')
+    thinking: chrome.runtime.getURL('thinking.png'),
+    thinkingBack: chrome.runtime.getURL('thinking-back.png')
 };
 
 const BUBBLE_LINES = [
     "Hmmmm, reading ${document.title}, I see!",
-    "Looks like you're exploring ${document.title}.",
     "Oh, ${document.title}? That's interesting!",
-    "I see you're diving into ${document.title}.",
     "Hmm, ${document.title} seems fun!",
-    "Enjoying ${document.title}, are we?",
-    "Ah, ${document.title}, a fine choice!",
-    "${document.title}? A curious pick!",
-    "You're on ${document.title}, fascinating!",
-    "${document.title} caught your attention, huh?"
+    "Enjoying ${document.title}, aisa kya hai isme?",
+    "${document.title} pe kuch zyada hi nahi, huh?"
 ];
 const MID_BUBBLE_LINES = [
-    "Hmmmm, reading ${document.title}, I see!",
-    "Looks like you're exploring ${document.title}.",
-    "Oh, ${document.title}? That's interesting!",
-    "I see you're diving into ${document.title}.",
-    "Hmm, ${document.title} seems fun!",
-    "Enjoying ${document.title}, are we?",
-    "Ah, ${document.title}, a fine choice!",
-    "${document.title}? A curious pick!",
-    "You're on ${document.title}, fascinating!",
-    "${document.title} caught your attention, huh?"
+    "Uhhh...Let's see what my silly girl is browsing.",
+    "Exploring WITHOUT ME⁉️",
+    "Hmm, ${document.title} again? Kuch aur bhi dekh le 💔💔💔",
+    "I wonder what ${document.title} is about...",
+    "Browsing ${document.title} akele akele? Tu ruk ab...🤬💢",
 ];
 
 // --- STATE VARIABLES ---
@@ -43,6 +34,8 @@ let direction = 1;
 let isRunning = false;
 let onBottom = false;
 let bottomPasses = 0;
+let hasStoppedTop = false;
+let hasStoppedBottom = false;
 
 // --- INIT ---
 function init() {
@@ -67,6 +60,8 @@ function init() {
     positionX = 0;
     onBottom = false;
     bottomPasses = 0;
+    hasStoppedTop = false;
+    hasStoppedBottom = false;
     isRunning = true;
     animate();
 }
@@ -87,6 +82,20 @@ function animate() {
     const speed = 3;
 
     positionX += speed * direction;
+
+    // --- RANDOM STOP LOGIC ---
+    // Check if we are in the middle 60% of the screen AND running Left-to-Right
+    if (isRunning && direction === 1 && positionX > (screenWidth * 0.2) && positionX < (screenWidth * 0.8)) {
+        // Determine if we are allowed to stop based on vertical position
+        const stopNeeded = onBottom ? !hasStoppedBottom : !hasStoppedTop;
+
+        // 0.5% chance per frame to stop (approx once per run across screen)
+        if (stopNeeded && Math.random() < 0.005) {
+            performRandomStop();
+            return; // Pause the animation loop here
+        }
+    }
+    // -------------------------
 
     if (positionX >= (screenWidth - charWidth)) {
         // RIGHT WALL
@@ -219,6 +228,11 @@ function startFlyUpSequence() {
     setTimeout(() => {
         // 3. Arrive at Top
         onBottom = false;
+        
+        // RESET FREQUENCY COUNTERS (New Loop Starts)
+        hasStoppedTop = false;
+        hasStoppedBottom = false;
+
         container.classList.remove('climbing');
         
         // 4. Resume Running Left
@@ -228,6 +242,32 @@ function startFlyUpSequence() {
         isRunning = true;
         animate();
     }, 2500); // Match CSS transition duration
+}
+
+function performRandomStop() {
+    isRunning = false;
+    imgElement.src = ASSETS.thinkingBack;
+
+    const bubble = document.getElementById('pixel-runner-bubble');
+    
+    // Pick random line from MID_BUBBLE_LINES
+    const randomIndex = Math.floor(Math.random() * MID_BUBBLE_LINES.length);
+    bubble.innerText = MID_BUBBLE_LINES[randomIndex].replace('${document.title}', document.title);
+
+    bubble.classList.add('visible');
+    // If at the top, force bubble below character
+    if (!onBottom) bubble.classList.add('below');
+
+    // Set flag so we don't stop again this level
+    if (onBottom) hasStoppedBottom = true;
+    else hasStoppedTop = true;
+
+    setTimeout(() => {
+        bubble.classList.remove('visible', 'below');
+        imgElement.src = ASSETS.run;
+        isRunning = true;
+        animate();
+    }, 5000); // 5 seconds pause
 }
 
 // --- LISTENERS ---
